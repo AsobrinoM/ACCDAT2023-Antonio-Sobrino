@@ -5,6 +5,7 @@
 package com.mycompany.file4lecturabytesarrays;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,33 +20,30 @@ import java.util.logging.Logger;
  */
 public class File4LecturaBytesArrays {
 
-    public static void main(String[] args) {
-       File prueba = new File("..\\File3EscrituraBytesArrays\\prueba.txt");
+    public static void main(String[] args) throws IOException {
+       File prueba = new File("..\\File3EscrituraBytesArrays\\prueba.dat");
+       
        System.out.println(prueba.getAbsolutePath());
-        String st;
+     
        try{
            FileInputStream fis = new FileInputStream(prueba);
-           BufferedReader br =  new BufferedReader(new InputStreamReader(fis));
-           String linea;
+           DataInputStream dis = new DataInputStream(fis);
+             String st;
+             int tlf;
           
-            boolean impar=true;
-           while ((linea=br.readLine())!=null){
+           
+           while (dis.available()>0){
                
-                String[] partes = linea.split(" - ");
-               
-                    st = partes[0];
-                   if(impar){
+              st=dis.readUTF();
+              tlf=dis.readInt();
                     System.out.print("Nombre: " + st + " " );
-                    impar=false;
-                   }
-                   else{
-                       System.out.println("Numero: " + st );
-                       impar=true;
-                   }
+                   System.out.println("Numero: " + tlf );
+                 
+                   
            
            }
            fis.close();
-           br.close();
+           dis.close();
        } catch (FileNotFoundException ex) {
                 System.out.println(ex);
                } catch (IOException ioe){
