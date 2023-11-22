@@ -24,6 +24,7 @@ public class BASEDEDATOS {
             // añadirCampo();
            // functodEmple();
           // funcionIva();
+          
           laNominaCarajo();
             // consultaExecute();
             // consultaPrepared();
@@ -58,26 +59,6 @@ public class BASEDEDATOS {
         Class.forName(driver);
         conexion = DriverManager.getConnection(urlconnection, propiedades);
         System.out.println("Conexion creada con ussop");
-    }  private static void consultaExecute()  {
-    try {
-        String sql = "Select * from departamentos";
-        Statement sentencia=conexion.createStatement();
-        Boolean valor = sentencia.execute(sql);
-        if (valor){
-            ResultSet resul = sentencia.getResultSet();
-            while(resul.next()){
-                System.out.println("Número de departamento:" + resul.getInt(1) + " "+ 
-                        "Nombre de departamento:" + resul.getString(2)+ " "+
-                                "Localidad:"+ resul.getString(3)+ " ");
-            }
-            
-        }
-    } catch (SQLException ex) {
-        System.out.println ("Ha ocurrido una excepcion:");
-        System.out.println ("Mensaje: " +ex.getMessage());  
-        System.out.println ("SQL Estado: " +ex.getSQLState());
-        System.out.println ("Código de error: " +ex.getErrorCode());
-    }
     }
           private static void consultaEmpleados() throws SQLException {
     String sql = "Select * from EMPLEADOS";
@@ -294,18 +275,46 @@ END CALCULAR_NOMINA;
              
           }
 
-    private static void obtenerInformacionDeLasTablas() throws SQLException {
-        ResultSet resul=null;
-        String nombre_usuario;
-        String nombre_tabla;
-        String[] tipos={"TABLE"};
-        resul = dbmd.getTables("ORCL18","C##DAM2",null,tipos);
-        while (resul.next()){
-            nombre_usuario = resul.getString("TABLE_SCHEM");
-            nombre_tabla=resul.getString("TABLE_NAME");
-            System.out.println("USUARIO:"+nombre_usuario+"TABLA:"+nombre_tabla);
+   private static void obtenerInformacionDeLasTablas() throws SQLException {
+        ResultSet result = null;
+        String nombreUsuario;
+        String nombreTabla;
+        String[] tipos = {"TABLE"};
+        result = dbmd.getTables("ORCL18", "C##DAM2", null, tipos);
+        while (result.next()) {
+            nombreUsuario = result.getString("TABLE_SCHEM");
+            nombreTabla = result.getString("TABLE_NAME");
+            System.out.println("USUARIO: " + nombreUsuario + " TABLA: " + nombreTabla);
+
+            // Obtener claves primarias
+            ResultSet primaryKeyResult = dbmd.getPrimaryKeys("ORCL18", "C##DAM2", nombreTabla);
+            while (primaryKeyResult.next()) {
+                String nombreColumnaPK = primaryKeyResult.getString("COLUMN_NAME");
+                System.out.println("   Clave primaria - COLUMNA: " + nombreColumnaPK);
+            }
+
+            // Obtener claves foráneas salientes
+            ResultSet exportedKeysResult = dbmd.getExportedKeys("ORCL18", "C##DAM2", nombreTabla);
+            while (exportedKeysResult.next()) {
+                String nombreColumnaFK = exportedKeysResult.getString("FKCOLUMN_NAME");
+                String nombreTablaDestino = exportedKeysResult.getString("PKTABLE_NAME");
+                String nombreColumnaPKDestino = exportedKeysResult.getString("PKCOLUMN_NAME");
+                System.out.println("   Clave foránea saliente - COLUMNA FK: " + nombreColumnaFK +
+                        " TABLA DESTINO: " + nombreTablaDestino + " COLUMNA PK DESTINO: " + nombreColumnaPKDestino);
+            }
+
+            // Obtener claves foráneas entrantes
+            ResultSet importedKeysResult = dbmd.getImportedKeys("ORCL18", "C##DAM2", nombreTabla);
+            while (importedKeysResult.next()) {
+                String nombreColumnaFK = importedKeysResult.getString("FKCOLUMN_NAME");
+                String nombreTablaOrigen = importedKeysResult.getString("PKTABLE_NAME");
+                String nombreColumnaPKOrigen = importedKeysResult.getString("PKCOLUMN_NAME");
+                System.out.println("   Clave foránea entrante - COLUMNA FK: " + nombreColumnaFK +
+                        " TABLA ORIGEN: " + nombreTablaOrigen + " COLUMNA PK ORIGEN: " + nombreColumnaPKOrigen);
+            }
         }
     }
+    
 
     private static void obtenerInformacionDeLasColumnas() throws SQLException{
      
