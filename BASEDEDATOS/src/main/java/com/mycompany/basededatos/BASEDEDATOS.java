@@ -13,7 +13,7 @@ public class BASEDEDATOS {
         try {
             establecerConexion();
              dbmd=conexion.getMetaData();
-             consultaExecute();
+       
             
             //insertarExecuteUpdate();
             //insertarExecute();
@@ -22,7 +22,9 @@ public class BASEDEDATOS {
             //obtenerEmpleadoMaxSalario();
             //FILE2SELECT(10);
             // añadirCampo();
-               consultaExecute();
+           // functodEmple();
+          // funcionIva();
+          laNominaCarajo();
             // consultaExecute();
             // consultaPrepared();
             conexion.close();
@@ -45,13 +47,14 @@ public class BASEDEDATOS {
         
     }
     }
+ 
     private static void establecerConexion() throws ClassNotFoundException, SQLException {
         String driver = "oracle.jdbc.driver.OracleDriver";
         String urlconnection = "jdbc:oracle:thin:@localhost:1521/ORCL18";
 
         Properties propiedades = new Properties();
-        propiedades.setProperty("user", "C##DAM2");
-        propiedades.setProperty("password", "dam2");
+        propiedades.setProperty("user", "C##USSOP");
+        propiedades.setProperty("password", "ala");
         Class.forName(driver);
         conexion = DriverManager.getConnection(urlconnection, propiedades);
         System.out.println("Conexion creada con ussop");
@@ -105,6 +108,54 @@ public class BASEDEDATOS {
          
          System.out.println("El nombre del departamento es: "+salida_return);
     }
+   public static void functodEmple() throws SQLException{
+          String sql="{?=call OBTENER_EMPLEADOS_POR_DEPARTAMENTO(?) }";
+          CallableStatement llamada=conexion.prepareCall(sql);
+          llamada.registerOutParameter(1, Types.VARCHAR);
+          llamada.setInt(2, 10);
+          llamada.executeUpdate();
+          String salida_return=llamada.getString(1);
+          System.out.println(salida_return);
+     
+ }
+   public static void laNominaCarajo() throws SQLException{
+       String sql="{?=call CALCULAR_NOMINA(? , ? , ?) }";
+       CallableStatement llamada=conexion.prepareCall(sql);
+       llamada.registerOutParameter(1,Types.VARCHAR);
+       llamada.setInt(2, 1000);
+       llamada.setInt(3, 200);
+       llamada.setInt(4, 20);
+       llamada.executeUpdate();
+       String salida=llamada.getString(1);
+       System.out.println(salida);
+       /**
+        * 
+        * CREATE OR REPLACE FUNCTION CALCULAR_NOMINA(salario number, comision number,irpf number)
+RETURN NUMBER
+AS
+    sinIrpf NUMBER;
+BEGIN
+    sinIrpf:=salario + comision-((salario+comision)*(irpf/100));
+    RETURN sinIrpf;
+END CALCULAR_NOMINA;
+        */
+       
+       
+       
+       
+       
+   }
+   public static void funcionIva() throws SQLException{
+       String sql="{?=call CALCULAR_IVA(? , ?) }";
+       CallableStatement llamada=conexion.prepareCall(sql);
+       llamada.registerOutParameter(1,Types.VARCHAR);
+       llamada.setDouble(2, 300.50);
+       llamada.setDouble(3,80.00);
+       llamada.executeUpdate();
+       String salida=llamada.getString(1);
+       System.out.println(salida);
+   }
+   
       public static void FILE1INSERTMYSQL() throws SQLException{
          int dep=15;
          String dnombre="INFORMÁTICA";
