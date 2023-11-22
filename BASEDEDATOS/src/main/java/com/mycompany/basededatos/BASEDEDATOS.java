@@ -58,7 +58,47 @@ public class BASEDEDATOS {
         Class.forName(driver);
         conexion = DriverManager.getConnection(urlconnection, propiedades);
         System.out.println("Conexion creada con ussop");
-    }public static void FILE2SELECT(int deptNo) throws SQLException {
+    }  private static void consultaExecute()  {
+    try {
+        String sql = "Select * from departamentos";
+        Statement sentencia=conexion.createStatement();
+        Boolean valor = sentencia.execute(sql);
+        if (valor){
+            ResultSet resul = sentencia.getResultSet();
+            while(resul.next()){
+                System.out.println("Número de departamento:" + resul.getInt(1) + " "+ 
+                        "Nombre de departamento:" + resul.getString(2)+ " "+
+                                "Localidad:"+ resul.getString(3)+ " ");
+            }
+            
+        }
+    } catch (SQLException ex) {
+        System.out.println ("Ha ocurrido una excepcion:");
+        System.out.println ("Mensaje: " +ex.getMessage());  
+        System.out.println ("SQL Estado: " +ex.getSQLState());
+        System.out.println ("Código de error: " +ex.getErrorCode());
+    }
+    }
+          private static void consultaEmpleados() throws SQLException {
+    String sql = "Select * from EMPLEADOS";
+    Statement sentencia=conexion.createStatement();
+    Boolean valor = sentencia.execute(sql);
+    if (valor){
+        ResultSet resul = sentencia.getResultSet();
+        while(resul.next()){
+            System.out.println("Número de Empleado:" + resul.getInt(1) + " "+
+                                "Apellido :" + resul.getString(2)+ " "+ 
+                                "Oficio:"+ resul.getString(3)+ " "+
+                                  "Fecha Alt:"+ resul.getDate(5)+ " "+
+                                    "SALARIO:"+ resul.getInt(6)+ " "+
+                                       "Comision:"+ resul.getInt(7)+ " "+
+                                        "Departamento:"+resul.getInt(8));
+        }       
+        
+    }
+    }
+
+public static void FILE2SELECT(int deptNo) throws SQLException {
         String sql = "SELECT APELLIDO,OFICIO, SALARIO FROM EMPLEADOS WHERE DEPT_NO = ?";
         try (PreparedStatement sentencia = conexion.prepareStatement(sql)) {
             sentencia.setInt(1, deptNo);
@@ -94,36 +134,12 @@ public class BASEDEDATOS {
         }
     }
 }
-   private static void ejecturarFuncion(int dept) throws SQLException{
-        String sql="{?=call nombre_depart_f(?)}";
-         CallableStatement llamada=conexion.prepareCall(sql);
-         
-         llamada.registerOutParameter(1, Types.VARCHAR);
-         
-         llamada.setInt(2, dept);
-         
-         llamada.executeUpdate();
-         
-         String salida_return=llamada.getString(1);
-         
-         System.out.println("El nombre del departamento es: "+salida_return);
-    }
-   public static void functodEmple() throws SQLException{
-          String sql="{?=call OBTENER_EMPLEADOS_POR_DEPARTAMENTO(?) }";
-          CallableStatement llamada=conexion.prepareCall(sql);
-          llamada.registerOutParameter(1, Types.VARCHAR);
-          llamada.setInt(2, 10);
-          llamada.executeUpdate();
-          String salida_return=llamada.getString(1);
-          System.out.println(salida_return);
-     
- }
-   public static void laNominaCarajo() throws SQLException{
+         public static void laNominaCarajo() throws SQLException{
        String sql="{?=call CALCULAR_NOMINA(? , ? , ?) }";
        CallableStatement llamada=conexion.prepareCall(sql);
        llamada.registerOutParameter(1,Types.VARCHAR);
        llamada.setInt(2, 1000);
-       llamada.setInt(3, 200);
+       llamada.setInt(3, 500);
        llamada.setInt(4, 20);
        llamada.executeUpdate();
        String salida=llamada.getString(1);
@@ -139,23 +155,45 @@ BEGIN
     RETURN sinIrpf;
 END CALCULAR_NOMINA;
         */
-       
-       
-       
-       
-       
    }
-   public static void funcionIva() throws SQLException{
-       String sql="{?=call CALCULAR_IVA(? , ?) }";
-       CallableStatement llamada=conexion.prepareCall(sql);
-       llamada.registerOutParameter(1,Types.VARCHAR);
-       llamada.setDouble(2, 300.50);
-       llamada.setDouble(3,80.00);
-       llamada.executeUpdate();
-       String salida=llamada.getString(1);
-       System.out.println(salida);
-   }
-   
+      public static void incrementoSal() throws SQLException {
+    String sql = "{?=call incrementoSalarial(?, ?)}";
+    CallableStatement llamada = conexion.prepareCall(sql);
+    llamada.registerOutParameter(1, Types.INTEGER);
+    llamada.setInt(2, 10);  // Departamento 10
+    llamada.setInt(3, 100); // Incremento de salario
+    llamada.executeUpdate();
+    int salida = llamada.getInt(1);
+
+    if (salida > 0) {
+        System.out.println("Incremento salarial realizado con éxito en el departamento 10.");
+    } else {
+        System.out.println("No se realizaron incrementos de salario en el departamento 10.");
+    }
+}
+      public static void GetNombreDep() throws SQLException {
+    String sql = "{?= call GETNOMBREDEP(?)}";
+    CallableStatement llamada = conexion.prepareCall(sql);
+    llamada.registerOutParameter(1, Types.VARCHAR);
+    llamada.setInt(2, 10);
+    llamada.executeUpdate();
+    String salida = llamada.getString(1);
+    System.out.println(salida);
+}
+   private static void ejecturarFuncion(int dept) throws SQLException{
+        String sql="{?=call nombre_depart_f(?)}";
+         CallableStatement llamada=conexion.prepareCall(sql);
+         
+         llamada.registerOutParameter(1, Types.VARCHAR);
+         
+         llamada.setInt(2, dept);
+         
+         llamada.executeUpdate();
+         
+         String salida_return=llamada.getString(1);
+         
+         System.out.println("El nombre del departamento es: "+salida_return);
+    }
       public static void FILE1INSERTMYSQL() throws SQLException{
          int dep=15;
          String dnombre="INFORMÁTICA";
